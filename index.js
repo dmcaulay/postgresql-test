@@ -22,13 +22,22 @@ pg.connect(conString, function(err, client, release) {
     ];
 
     async.each(books, function(book, callback) {
-      client.query("INSERT INTO books (data) VALUES ($1)", [book], callback);
+      callback();
+      // client.query("INSERT INTO books (data) VALUES ($1)", [book], callback);
     }, function(err) {
       if (err) return handleErr('error inserting book', err);
-      client.query("SELECT id, data->'author'->>'first_name' as author_first_name FROM books", function(err, result) {
+      var queries = [
+        "SELECT id, data->'author'->>'first_name' as author_first_name FROM books",
+        "SELECT * FROM books WHERE data->'author'->>'first_name' = 'Charles'"
+      ];
+      async.map(queries, function(q, callback) {
+        client.query(q, callback);
+      }, function(err, results) {
         if (err) return handleErr('error selecting books', err);
         release();
-        console.log(result.rows);
+        results.forEach(function(res) {
+          console.log(res.rows);
+        });
       });
     });
   });
