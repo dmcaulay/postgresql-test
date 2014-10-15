@@ -36,8 +36,11 @@ pg.connect(conString, function(err, client, release) {
         if (err) return handleErr('error selecting books', err);
         release();
         results.forEach(function(res) {
-          console.log(res.rows);
+          console.log(results);
         });
+        // update sql
+        // UPDATE books SET data = json_object_set(data, '{"name":"Book the Updated"}') WHERE data->'author'->>'first_name' = 'Charles';
+        "UPDATE books SET data = json_object_set(data, $1) WHERE data->'author'->>'first_name' = 'Charles'";
       });
     });
   });
